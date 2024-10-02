@@ -5,7 +5,7 @@
  * @format
  */
 
-import React from 'react';
+import React, {useCallback, useEffect} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -24,6 +24,7 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+import {connectToDatabase, createTables} from './db/db';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -61,6 +62,19 @@ function App(): React.JSX.Element {
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
+
+  const loadData = useCallback(async () => {
+    try {
+      const db = await connectToDatabase();
+      await createTables(db);
+    } catch (error) {
+      console.error(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   return (
     <SafeAreaView style={backgroundStyle}>
